@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+  <title>JYNEX Mining</title>
+
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background:
+        radial-gradient(circle at top, #292929 0%, #101010 45%, #050505 100%);
+      color: white;
+      min-height: 100vh;
+      padding: 20px 16px 30px;
+    }
+
+    .app {
+      max-width: 480px;
+      margin: auto;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 25px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: linear-gradient(145deg, #f5c65d, #8a5b08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 23px;
+      box-shadow: 0 0 20px rgba(239, 178, 44, .25);
+    }
+
+    .brand h1 {
+      font-size: 22px;
+      letter-spacing: 1px;
+    }
+
+    .brand p {
+      color: #999;
+      font-size: 12px;
+      margin-top: 3px;
+    }
+
+    .user {
+      background: #191919;
+      border: 1px solid #333;
+      border-radius: 20px;
+      padding: 8px 12px;
+      font-size: 12px;
+      color: #ccc;
+    }
+
+    .balance-card {
+      background: linear-gradient(145deg, #252525, #111);
+      border: 1px solid #3b3b3b;
+      border-radius: 24px;
+      padding: 25px 20px;
+      text-align: center;
+      box-shadow: 0 15px 40px rgba(0,0,0,.35);
+    }
+
+    .balance-label {
+      color: #999;
+      font-size: 13px;
+      margin-bottom: 8px;
+    }
+
+    .balance {
+      font-size: 42px;
+      font-weight: 800;
+      color: #f2c14e;
+      text-shadow: 0 0 18px rgba(242,193,78,.2);
+    }
+
+    .currency {
+      font-size: 16px;
+      color: #ddd;
+      margin-left: 5px;
+    }
+
+    .rate {
+      margin-top: 8px;
+      color: #aaa;
+      font-size: 13px;
+    }
+
+    .mining-box {
+      margin-top: 18px;
+      background: #171717;
+      border: 1px solid #303030;
+      border-radius: 20px;
+      padding: 18px;
+    }
+
+    .mining-status {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      font-size: 13px;
+    }
+
+    .status {
+      color: #999;
+    }
+
+    .status.active {
+      color: #65df91;
+    }
+
+    .progress {
+      height: 8px;
+      background: #2b2b2b;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, #9b6810, #f2c14e);
+      border-radius: 10px;
+      transition: width .3s;
+    }
+
+    .mine-btn {
+      width: 100%;
+      margin-top: 18px;
+      padding: 16px;
+      border: none;
+      border-radius: 15px;
+      background: linear-gradient(135deg, #f3c653, #a66e0c);
+      color: #111;
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: .5px;
+      cursor: pointer;
+      box-shadow: 0 8px 25px rgba(221,164,43,.2);
+    }
+
+    .mine-btn:active {
+      transform: scale(.98);
+    }
+
+    .mine-btn.stop {
+      background: #292929;
+      color: #f2c653;
+      border: 1px solid #555;
+    }
+
+    .section-title {
+      font-size: 16px;
+      margin: 25px 3px 12px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .action {
+      background: #191919;
+      border: 1px solid #303030;
+      border-radius: 18px;
+      padding: 18px 12px;
+      text-align: center;
+      cursor: pointer;
+    }
+
+    .action:active {
+      transform: scale(.97);
+    }
+
+    .action-icon {
+      font-size: 27px;
+      margin-bottom: 8px;
+    }
+
+    .action-title {
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .action-sub {
+      color: #777;
+      font-size: 11px;
+      margin-top: 4px;
+    }
+
+    .referral {
+      margin-top: 12px;
+      background: linear-gradient(145deg, #211d13, #15120d);
+      border: 1px solid #58451e;
+      border-radius: 20px;
+      padding: 18px;
+    }
+
+    .referral h3 {
+      color: #f2c653;
+      font-size: 15px;
+      margin-bottom: 7px;
+    }
+
+    .referral p {
+      color: #999;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .ref-btn {
+      width: 100%;
+      margin-top: 13px;
+      padding: 12px;
+      border-radius: 12px;
+      border: 1px solid #80641f;
+      background: #241d0e;
+      color: #f2c653;
+      font-weight: 700;
+    }
+
+    .footer {
+      text-align: center;
+      color: #555;
+      font-size: 10px;
+      margin-top: 25px;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 25px;
+      transform: translateX(-50%) translateY(100px);
+      background: #242424;
+      border: 1px solid #444;
+      color: white;
+      padding: 12px 18px;
+      border-radius: 12px;
+      font-size: 13px;
+      opacity: 0;
+      transition: .3s;
+      z-index: 10;
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="app">
+
+  <div class="header">
+    <div class="brand">
+      <div class="logo">⛏️</div>
+
+      <div>
+        <h1>JYNEX</h1>
+        <p>MINING ECOSYSTEM</p>
+      </div>
+    </div>
+
+    <div class="user" id="username">
+      Guest
+    </div>
+  </div>
+
+
+  <div class="balance-card">
+
+    <div class="balance-label">
+      YOUR JYNEX BALANCE
+    </div>
+
+    <div class="balance">
+      <span id="balance">0.00</span>
+      <span class="currency">JNX</span>
+    </div>
+
+    <div class="rate">
+      Mining rate: <b>10 JNX / hour</b>
+    </div>
+
+    <div class="mining-box">
+
+      <div class="mining-status">
+        <span class="status" id="status">
+          Mining is stopped
+        </span>
+
+        <span id="timer">
+          00:00
+        </span>
+      </div>
+
+      <div class="progress">
+        <div class="progress-bar" id="progress"></div>
+      </div>
+
+      <button class="mine-btn" id="mineBtn" onclick="toggleMining()">
+        ⛏️ START MINING
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <div class="section-title">
+    Quick Actions
+  </div>
+
+  <div class="grid">
+
+    <div class="action" onclick="dailyReward()">
+      <div class="action-icon">🎁</div>
+      <div class="action-title">Daily Reward</div>
+      <div class="action-sub">Claim daily points</div>
+    </div>
+
+    <div class="action" onclick="showTasks()">
+      <div class="action-icon">📋</div>
+      <div class="action-title">Tasks</div>
+      <div class="action-sub">Earn more JNX</div>
+    </div>
+
+    <div class="action" onclick="invite()">
+      <div class="action-icon">👥</div>
+      <div class="action-title">Invite</div>
+      <div class="action-sub">Invite friends</div>
+    </div>
+
+    <div class="action" onclick="withdraw()">
+      <div class="action-icon">💰</div>
+      <div class="action-title">Withdraw</div>
+      <div class="action-sub">Coming soon</div>
+    </div>
+
+  </div>
+
+
+  <div class="referral">
+
+    <h3>🚀 Invite & Earn</h3>
+
+    <p>
+      Invite your friends to JYNEX and earn bonus JNX points.
+    </p>
+
+    <button class="ref-btn" onclick="invite()">
+      INVITE FRIENDS
+    </button>
+
+  </div>
+
+
+  <div class="footer">
+    JYNEX • Mining Points Demo
+  </div>
+
+</div>
+
+
+<div class="toast" id="toast"></div>
+
+
+<script>
+
+  const tg = window.Telegram.WebApp;
+
+  tg.ready();
+  tg.expand();
+
+
+  let balance = parseFloat(
+    localStorage.getItem("jynex_balance") || "0"
+  );
+
+  let mining = false;
+  let miningSeconds = 0;
+  let miningInterval = null;
+
+
+  function updateBalance() {
+
+    document.getElementById("balance").innerText =
+      balance.toFixed(2);
+
+    localStorage.setItem(
+      "jynex_balance",
+      balance.toString()
+    );
+  }
+
+
+  function showToast(message) {
+
+    const toast = document.getElementById("toast");
+
+    toast.innerText = message;
+    toast.classList.add("show");
+
+    setTimeout(() => {
+      toast.classList.remove("show");
+    }, 2200);
+  }
+
+
+  function toggleMining() {
+
+    if (mining) {
+
+      stopMining();
+
+    } else {
+
+      startMining();
+
+    }
+
+  }
+
+
+  function startMining() {
+
+    mining = true;
+
+    const btn = document.getElementById("mineBtn");
+    const status = document.getElementById("status");
+
+    btn.innerText = "⏹ STOP MINING";
+    btn.classList.add("stop");
+
+    status.innerText = "● Mining active";
+    status.classList.add("active");
+
+    miningInterval = setInterval(() => {
+
+      miningSeconds++;
+
+      /*
+        Demo mining:
+        10 JNX per hour
+        = 10 / 3600 per second
+      */
+
+      balance += 10 / 3600;
+
+      updateBalance();
+
+      updateTimer();
+
+      const progress =
+        (miningSeconds % 3600) / 3600 * 100;
+
+      document.getElementById("progress").style.width =
+        progress + "%";
+
+    }, 1000);
+
+    showToast("⛏️ JYNEX mining started!");
+  }
+
+
+  function stopMining() {
+
+    mining = false;
+
+    clearInterval(miningInterval);
+
+    const btn = document.getElementById("mineBtn");
+    const status = document.getElementById("status");
+
+    btn.innerText = "⛏️ START MINING";
+    btn.classList.remove("stop");
+
+    status.innerText = "Mining is stopped";
+    status.classList.remove("active");
+
+    showToast("Mining stopped");
+  }
+
+
+  function updateTimer() {
+
+    const hours =
+      Math.floor(miningSeconds / 3600);
+
+    const minutes =
+      Math.floor((miningSeconds % 3600) / 60);
+
+    const seconds =
+      miningSeconds % 60;
+
+    document.getElementById("timer").innerText =
+      String(hours).padStart(2, "0") + ":" +
+      String(minutes).padStart(2, "0") + ":" +
+      String(seconds).padStart(2, "0");
+  }
+
+
+  function dailyReward() {
+
+    const today =
+      new Date().toISOString().split("T")[0];
+
+    const lastReward =
+      localStorage.getItem("jynex_daily");
+
+    if (lastReward === today) {
+
+      showToast("🎁 Daily reward already claimed!");
+
+      return;
+    }
+
+    balance += 25;
+
+    localStorage.setItem(
+      "jynex_daily",
+      today
+    );
+
+    updateBalance();
+
+    showToast("🎁 +25 JNX Daily Reward!");
+  }
+
+
+  function showTasks() {
+
+    showToast("📋 Tasks system coming soon!");
+  }
+
+
+  function invite() {
+
+    const botUsername = "JynexMiningBot";
+
+    const text =
+      "🚀 Join me on JYNEX Mining and earn JNX points!";
+
+    const url =
+      "https://t.me/" + botUsername;
+
+    const shareUrl =
+      "https://t.me/share/url?url=" +
+      encodeURIComponent(url) +
+      "&text=" +
+      encodeURIComponent(text);
+
+    if (tg.openTelegramLink) {
+
+      tg.openTelegramLink(shareUrl);
+
+    } else {
+
+      window.open(shareUrl, "_blank");
+
+    }
+
+  }
+
+
+  function withdraw() {
+
+    showToast("💰 Withdrawal system coming soon!");
+
+  }
+
+
+  /*
+    Telegram user information
+  */
+
+  if (
+    tg.initDataUnsafe &&
+    tg.initDataUnsafe.user
+  ) {
+
+    const user =
+      tg.initDataUnsafe.user;
+
+    document.getElementById("username").innerText =
+      user.username
+        ? "@" + user.username
+        : user.first_name || "User";
+
+  }
+
+
+  updateBalance();
+
+</script>
+
+</body>
+</html>
