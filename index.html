@@ -630,9 +630,12 @@ async function connectJynexUser() {
   const initData = tg.initData;
 
   if (!initData) {
-    console.log("Telegram initData not available");
-    return;
-  }
+  alert("Telegram initData NOT available");
+  return;
+}
+  
+    
+  
 
   try {
     const response = await fetch(`${API_URL}/api/user`, {
