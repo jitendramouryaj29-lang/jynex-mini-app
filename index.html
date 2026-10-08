@@ -618,6 +618,53 @@
   updateBalance();
 
 </script>
+<script>
+const API_URL = "https://jynex-api.jitendramouryaj29.workers.dev";
 
+async function connectJynexUser() {
+  const tg = window.Telegram.WebApp;
+
+  tg.ready();
+  tg.expand();
+
+  const initData = tg.initData;
+
+  if (!initData) {
+    console.log("Telegram initData not available");
+    return;
+  }
+
+  try {
+    const response = await fetch(`${API_URL}/api/user`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        initData: initData
+      })
+    });
+
+    const data = await response.json();
+
+    if (data.success) {
+      console.log("JYNEX user connected:", data.user);
+
+      window.JYNEX_USER = data.user;
+
+      // Existing balance ko database balance se sync karo
+      if (typeof balance !== "undefined") {
+        balance = Number(data.user.balance || 0);
+      }
+    } else {
+      console.error("JYNEX API error:", data.error);
+    }
+  } catch (error) {
+    console.error("Connection error:", error);
+  }
+}
+
+connectJynexUser();
+</script>
 </body>
 </html>
