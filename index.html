@@ -651,7 +651,7 @@ async function connectJynexUser() {
     const data = await response.json();
 
     if (data.success) {
-      console.log("JYNEX user connected:", data.user);
+      alert("JYNEX user connected successfully");
 
       window.JYNEX_USER = data.user;
 
@@ -660,7 +660,7 @@ async function connectJynexUser() {
         balance = Number(data.user.balance || 0);
       }
     } else {
-      console.error("JYNEX API error:", data.error);
+      alert("API ERROR: " + data.error);
     }
   } catch (error) {
     console.error("Connection error:", error);
